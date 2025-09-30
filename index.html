@@ -1,0 +1,2010 @@
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PhytoIn Web</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+
+            h1 {
+                color: #2e7d32;
+                text-align: center;
+                margin-bottom: 30px;
+                font-size: 2rem;
+            }
+
+            .upload-area {
+                border: 3px dashed #81c784;
+                border-radius: 15px;
+                padding: 40px;
+                text-align: center;
+                background: #f1f8e9;
+                margin-bottom: 30px;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+
+            .upload-area:hover {
+                background: #e8f5e9;
+                border-color: #66bb6a;
+            }
+
+            .upload-area.dragover {
+                background: #c8e6c9;
+                border-color: #4caf50;
+            }
+
+            .upload-icon {
+                font-size: 48px;
+                color: #66bb6a;
+                margin-bottom: 10px;
+            }
+
+            .file-input {
+                display: none;
+            }
+
+            .csv-options {
+                display: flex;
+                gap: 30px;
+                justify-content: center;
+                margin: 20px 0;
+                padding: 20px;
+                background: #f5f5f5;
+                border-radius: 10px;
+            }
+
+            .option-group {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .option-group label {
+                color: #555;
+                font-weight: 500;
+            }
+
+            .checkbox-group {
+                display: flex;
+                gap: 15px;
+            }
+
+            .method-selector {
+                display: none;
+                margin: 30px 0;
+            }
+
+            .method-cards {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin-top: 20px;
+            }
+
+            .method-card {
+                border: 2px solid #e0e0e0;
+                border-radius: 15px;
+                padding: 20px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                background: #fafafa;
+            }
+
+            .method-card:hover {
+                border-color: #81c784;
+                background: #f1f8e9;
+            }
+
+            .method-card.selected {
+                border-color: #4caf50;
+                background: #e8f5e9;
+            }
+
+            .method-card h3 {
+                color: #2e7d32;
+                margin-bottom: 10px;
+            }
+
+            .config-panel {
+                display: none;
+                margin-top: 30px;
+                padding: 25px;
+                background: #f9fbe7;
+                border-radius: 15px;
+                border: 1px solid #dcedc8;
+            }
+
+            .config-group {
+                margin-bottom: 20px;
+            }
+
+            .config-group label {
+                display: block;
+                color: #555;
+                font-weight: 500;
+                margin-bottom: 8px;
+            }
+
+            .config-group select,
+            .config-group input[type="text"],
+            .config-group input[type="number"] {
+                width: 100%;
+                padding: 10px;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                font-size: 14px;
+                transition: border-color 0.3s ease;
+            }
+
+            .config-group select:focus,
+            .config-group input[type="text"]:focus,
+            .config-group input[type="number"]:focus {
+                outline: none;
+                border-color: #66bb6a;
+            }
+
+            .checkbox-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .checkbox-wrapper input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                background: #4caf50;
+                color: white;
+                border: none;
+                border-radius: 25px;
+                font-size: 16px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .btn:hover {
+                background: #45a049;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(76,175,80,0.3);
+            }
+
+            .btn:disabled {
+                background: #cccccc;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .btn-secondary {
+                background: #66bb6a;
+            }
+
+            .btn-secondary:hover {
+                background: #5cb85c;
+            }
+
+            .results-section {
+                display: none;
+                margin-top: 40px;
+            }
+
+            .result-card {
+                background: white;
+                border: 1px solid #e0e0e0;
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 25px;
+            }
+
+            .result-card h3 {
+                color: #2e7d32;
+                margin-bottom: 15px;
+            }
+
+            .data-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+            }
+
+            .data-table th {
+                background: #66bb6a;
+                color: white;
+                padding: 10px;
+                text-align: left;
+                font-weight: 500;
+            }
+
+            .data-table td {
+                padding: 8px 10px;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .data-table tr:hover {
+                background: #f5f5f5;
+            }
+
+            .table-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .btn-small {
+                padding: 8px 20px;
+                font-size: 14px;
+            }
+
+            .error-message {
+                background: #ffebee;
+                color: #c62828;
+                padding: 15px;
+                border-radius: 10px;
+                margin: 20px 0;
+                display: none;
+            }
+
+            .success-message {
+                background: #e8f5e9;
+                color: #2e7d32;
+                padding: 15px;
+                border-radius: 10px;
+                margin: 20px 0;
+                display: none;
+            }
+
+            .two-columns {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+
+            @media (max-width: 768px) {
+                .method-cards {
+                    grid-template-columns: 1fr;
+                }
+                .two-columns {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <img src="phytoin_web.jpg" alt="PhytoIn Web" style="max-width: 100%; width: 600px; height: auto; display: block; margin: 0 auto;">
+            </div>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <p><strong>Arraste seu arquivo CSV aqui</strong></p>
+                <p>ou clique para selecionar</p>
+                <input type="file" id="fileInput" class="file-input" accept=".csv">
+            </div>
+
+            <div class="csv-options">
+                <div class="option-group">
+                    <label>Separador de colunas:</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="radio" name="separator" value=";" checked> Ponto e vírgula (;)
+                        </label>
+                        <label>
+                            <input type="radio" name="separator" value=","> Vírgula (,)
+                        </label>
+                    </div>
+                </div>
+                <div class="option-group">
+                    <label>Marcador decimal:</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="radio" name="decimal" value="," checked> Vírgula (,)
+                        </label>
+                        <label>
+                            <input type="radio" name="decimal" value="."> Ponto (.)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <div class="method-selector" id="methodSelector">
+                <h2 style="color: #2e7d32; margin-bottom: 20px;">Selecione o Método de Amostragem</h2>
+                <div class="method-cards">
+                    <div class="method-card" data-method="quadrat">
+                        <h3>🏁 Parcela</h3>
+                        <p>Método de parcelas fixas para análise da vegetação</p>
+                    </div>
+                    <div class="method-card" data-method="point">
+                        <h3>📍 Ponto-Quadrante</h3>
+                        <p>Método de pontos com medição de distâncias</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-panel" id="configPanel">
+                <h2 style="color: #2e7d32; margin-bottom: 20px;">Configurações da Análise</h2>
+
+                <div class="two-columns">
+                    <div class="config-group">
+                        <label>Coluna com o nome da espécie (Táxon):</label>
+                        <select id="taxonColumn"></select>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Tipo de medida:</label>
+                        <select id="measureType">
+                            <option value="cbh">PAP - Perímetro na Altura do Peito</option>
+                            <option value="dbh">DAP - Diâmetro na Altura do Peito</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="two-columns">
+                    <div class="config-group">
+                        <label>Coluna com a medida (PAP/DAP):</label>
+                        <select id="measureColumn"></select>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Coluna com a altura do fuste:</label>
+                        <select id="heightColumn"></select>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="noHeight">
+                            <label for="noHeight">Não incluir altura (não calcular volume)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="two-columns">
+                    <div class="config-group">
+                        <label>Coluna com a família:</label>
+                        <select id="familyColumn"></select>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="noFamily">
+                            <label for="noFamily">Não incluir família</label>
+                        </div>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Coluna com a unidade amostral:</label>
+                        <select id="suColumn"></select>
+                    </div>
+                </div>
+
+                <div class="two-columns">
+                <div class="config-group" id="distanceGroup" style="display: none;">
+                    <label>Coluna com a distância do ponto à árvore:</label>
+                    <select id="distanceColumn"></select>
+                </div>
+
+                    <div class="config-group">
+                        <label>Como as árvores mortas foram indicadas:</label>
+                        <input type="text" id="deadIndicator" placeholder="Ex: morta, dead, m">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="removeDead">
+                            <label for="removeDead">Desconsiderar árvores mortas</label>
+                        </div>
+                    </div>
+
+                    <div class="config-group" id="suSizeGroup">
+                        <label>Tamanho da unidade amostral (m²):</label>
+                        <input type="number" id="suSize" value="100" min="1" step="1">
+                    </div>
+
+                </div>
+
+                <div class="config-group">
+                    <label>Fator de forma (0-1):</label>
+                    <input type="number" id="shapeFactor" value="1" min="0" max="1" step="0.01">
+                </div>
+
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="checkSpelling" checked>
+                    <label for="checkSpelling">Verificar grafia dos táxons</label>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" id="calculateBtn">Calcular Parâmetros</button>
+                </div>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="result-card" id="globalResults">
+                    <h3>Parâmetros Globais</h3>
+                    <div id="globalTable"></div>
+                    <div class="table-actions">
+                        <button class="btn btn-secondary btn-small" onclick="copyToWord('global')">📝 Copiar para Word</button>
+                        <button class="btn btn-secondary btn-small" onclick="copyToExcel('global')">📋 Copiar para Excel</button>
+                        <button class="btn btn-secondary btn-small" onclick="downloadCSV('global')">💾 Baixar CSV</button>
+                    </div>
+                </div>
+
+                <div class="result-card" id="familyResults" style="display: none;">
+                    <h3>Famílias</h3>
+                    <div id="familyTable"></div>
+                    <div class="table-actions">
+                        <button class="btn btn-secondary btn-small" onclick="copyToWord('family')">📝 Copiar para Word</button>
+                        <button class="btn btn-secondary btn-small" onclick="copyToExcel('family')">📋 Copiar para Excel</button>
+                        <button class="btn btn-secondary btn-small" onclick="downloadCSV('family')">💾 Baixar CSV</button>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h3>Parâmetros Fitossociológicos</h3>
+                    <div id="paramTable"></div>
+                    <div class="table-actions">
+                        <button class="btn btn-secondary btn-small" onclick="copyToWord('param')">📝 Copiar para Word</button>
+                        <button class="btn btn-secondary btn-small" onclick="copyToExcel('param')">📋 Copiar para Excel</button>
+                        <button class="btn btn-secondary btn-small" onclick="downloadCSV('param')">💾 Baixar CSV</button>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="downloadProcessedData()">💾 Baixar Dados com Área Basal</button>
+                    <button class="btn" onclick="resetAnalysis()">🔄 Nova Análise</button>
+                </div>
+            </div>
+
+            <!-- Adicionar ANTES do fechamento da div.container -->
+    <div class="stats-section" id="statsSection" style="display: none; margin-top: 30px;">
+        <details class="stats-expandable" style="background: #f9fbe7; border: 2px solid #81c784; border-radius: 15px; padding: 20px;">
+            <summary style="cursor: pointer; font-size: 1.2em; color: #2e7d32; font-weight: 600;">
+                📊 Analisar estatísticas do inventário?
+            </summary>
+
+            <div style="margin-top: 20px;">
+                <div class="two-columns">
+                    <div class="config-group">
+                        <label>Área total do habitat (ha):</label>
+                        <input type="number" id="areaTot" min="1" step="1" required>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Probabilidade do intervalo de confiança:</label>
+                        <input type="number" id="probConf" value="0.95" min="0.01" max="0.99" step="0.01">
+                    </div>
+                </div>
+
+                <div class="two-columns">
+                    <div class="config-group">
+                        <label>Fator de forma (0-1):</label>
+                        <input type="number" id="shapeFactorStats" value="1" min="0" max="1" step="0.01">
+                    </div>
+
+                    <div class="config-group">
+                        <label style="margin-top: 20px;">
+                            <input type="checkbox" id="rmDead" style="width: 20px; height: 20px; margin-right: 10px;">
+                            Desconsiderar árvores mortas
+                        </label>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="calculateStatistics()">Calcular Estatísticas</button>
+                </div>
+
+                <div id="statsResults" style="display: none; margin-top: 30px;">
+                    <div class="result-card">
+                        <h3>Inventário</h3>
+                        <div id="inventoryTable"></div>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary btn-small" onclick="copyToWord('inventory')">📝 Copiar para Word</button>
+                            <button class="btn btn-secondary btn-small" onclick="copyToExcel('inventory')">📋 Copiar para Excel</button>
+                            <button class="btn btn-secondary btn-small" onclick="downloadCSV('inventory')">💾 Baixar CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Estatísticas por hectare</h3>
+                        <div id="haTable"></div>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary btn-small" onclick="copyToWord('ha')">📝 Copiar para Word</button>
+                            <button class="btn btn-secondary btn-small" onclick="copyToExcel('ha')">📋 Copiar para Excel</button>
+                            <button class="btn btn-secondary btn-small" onclick="downloadCSV('ha')">💾 Baixar CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Estatísticas da população</h3>
+                        <div id="populationTable"></div>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary btn-small" onclick="copyToWord('population')">📝 Copiar para Word</button>
+                            <button class="btn btn-secondary btn-small" onclick="copyToExcel('population')">📋 Copiar para Excel</button>
+                            <button class="btn btn-secondary btn-small" onclick="downloadCSV('population')">💾 Baixar CSV</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </details>
+    </div>
+            <footer style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e0e0e0; text-align: center;">
+            <p style="color: #666; font-size: 14px; margin: 0;">
+                © 2025 Rodrigo Pereira
+            </p>
+        </footer>
+        </div>
+        
+    <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+        
+                <script>
+                    let csvData = null;
+                    let selectedMethod = null;
+                    let processedData = null;
+                    let results = {};
+                    let statsResults = {};
+                    let currentConfig = null;
+                    let csvSeparator = ';';
+                    let csvDecimal = ',';
+
+            // Event listeners
+            document.getElementById('uploadArea').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+
+            document.getElementById('uploadArea').addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add('dragover');
+            });
+
+            document.getElementById('uploadArea').addEventListener('dragleave', (e) => {
+                e.currentTarget.classList.remove('dragover');
+            });
+
+            document.getElementById('uploadArea').addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+
+            document.getElementById('fileInput').addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+
+            // Method selection
+            document.querySelectorAll('.method-card').forEach(card => {
+              card.addEventListener('click', function() {
+                document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedMethod = this.dataset.method;
+
+                // Mostrar/ocultar campos conforme o método
+                const distanceGroup = document.getElementById('distanceGroup');
+                const suSizeGroup   = document.getElementById('suSizeGroup');
+
+                if (selectedMethod === 'point') {
+                  distanceGroup.style.display = 'block';
+                  suSizeGroup.style.display   = 'none';
+                } else {
+                  distanceGroup.style.display = 'none';
+                  suSizeGroup.style.display   = 'block';
+                }
+
+                document.getElementById('configPanel').style.display = 'block';
+              });
+            });
+
+
+            // Checkbox listeners
+            document.getElementById('noHeight').addEventListener('change', function() {
+                document.getElementById('heightColumn').disabled = this.checked;
+            });
+
+            document.getElementById('noFamily').addEventListener('change', function() {
+                document.getElementById('familyColumn').disabled = this.checked;
+            });
+
+            // Update CSV settings
+            document.querySelectorAll('input[name="separator"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    csvSeparator = e.target.value;
+                });
+            });
+
+            document.querySelectorAll('input[name="decimal"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    csvDecimal = e.target.value;
+                });
+            });
+
+            // Calculate button
+            document.getElementById('calculateBtn').addEventListener('click', async () => { await calculateParameters(); });
+    function handleFile(file) {
+                if (!file.name.endsWith('.csv')) {
+                    showError('Por favor, selecione um arquivo CSV.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    parseCSV(e.target.result);
+                };
+                reader.readAsText(file);
+            }
+
+            function parseCSV(content) {
+                const lines = content.split('\n').filter(line => line.trim());
+
+                if (lines.length < 2) {
+                    showError('O arquivo CSV está vazio ou possui apenas uma linha.');
+                    return;
+                }
+
+                // Check for header
+                const firstLine = lines[0];
+                const hasHeader = isNaN(parseFloat(firstLine.split(csvSeparator)[0].replace(csvDecimal, '.')));
+
+                if (!hasHeader) {
+                    showError('O arquivo deve conter uma linha de cabeçalho com os nomes das colunas.');
+                    return;
+                }
+
+                // Parse data
+                const headers = firstLine.split(csvSeparator).map(h => h.trim());
+                const data = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(csvSeparator).map(v => v.trim());
+                    if (values.length === headers.length) {
+                        const row = {};
+                        headers.forEach((header, index) => {
+                            row[header] = values[index];
+                        });
+                        data.push(row);
+                    }
+                }
+
+                csvData = data;
+                populateColumnSelects(headers);
+                showSuccess(`Arquivo carregado com sucesso! ${data.length} registros encontrados.`);
+                document.getElementById('methodSelector').style.display = 'block';
+            }
+
+            function populateColumnSelects(headers) {
+                const selects = [
+                    'taxonColumn', 'measureColumn', 'heightColumn', 
+                    'familyColumn', 'suColumn', 'distanceColumn'
+                ];
+
+                selects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    select.innerHTML = '<option value="">-- Selecione --</option>';
+                    headers.forEach(header => {
+                        const option = document.createElement('option');
+                        option.value = header;
+                        option.textContent = header;
+                        select.appendChild(option);
+                    });
+                });
+            }
+
+            async function calculateParameters() {
+                if (!csvData || !selectedMethod) {
+                    showError('Por favor, carregue um arquivo e selecione um método.');
+                    return;
+                }
+
+                // Get configuration values
+                const config = {
+                    method: selectedMethod,
+                    taxon: document.getElementById('taxonColumn').value,
+                    measureType: document.getElementById('measureType').value,
+                    measure: document.getElementById('measureColumn').value,
+                    height: !document.getElementById('noHeight').checked ? document.getElementById('heightColumn').value : null,
+                    family: !document.getElementById('noFamily').checked ? document.getElementById('familyColumn').value : null,
+                    su: document.getElementById('suColumn').value,
+                    distance: selectedMethod === 'point' ? document.getElementById('distanceColumn').value : null,
+                    dead: document.getElementById('deadIndicator').value || 'morta',
+                    removeDead: document.getElementById('removeDead').checked,
+                    suSize: parseFloatNorm(document.getElementById('suSize').value),
+                    shapeFactor: parseFloatNorm(document.getElementById('shapeFactor').value),
+                    checkSpelling: document.getElementById('checkSpelling').checked
+                };
+                
+                currentConfig = config;
+
+                // Validate required fields
+                if (!config.taxon || !config.measure || !config.su) {
+                    showError('Por favor, preencha todos os campos obrigatórios.');
+                    return;
+                }
+
+                if (selectedMethod === 'point' && !config.distance) {
+                    showError('Para o método ponto-quadrante, a coluna de distância é obrigatória.');
+                    return;
+                }
+
+                // Mostrar/ocultar campos conforme o método
+                if (selectedMethod === 'point') {
+                    document.getElementById('distanceGroup').style.display = 'block';
+                    document.getElementById('suSizeGroup').style.display = 'none';
+                } else if (selectedMethod === 'quadrat') {
+                    document.getElementById('distanceGroup').style.display = 'none';
+                    document.getElementById('suSizeGroup').style.display = 'block';
+                }
+
+                if (config.height && !document.getElementById('heightColumn').value) {
+                    showError('Por favor, selecione a coluna de altura ou marque "Não incluir altura".');
+                    return;
+                }
+
+                try {
+                    // Process data
+
+      // --- Revisão de grafia (espelha o agrep/menu do R) ---
+      if (config.checkSpelling) {
+        // taxa (espécies)
+        const taxonMap = await checkAndResolveSpelling(csvData, config.taxon, config.dead, 'Táxon');
+        if (taxonMap && Object.keys(taxonMap).length) {
+          csvData = applyNameMapping(csvData, config.taxon, taxonMap);
+        }
+        // famílias, se houver
+        if (config.family && !document.getElementById('noFamily')?.checked) {
+          const familyMap = await checkAndResolveSpelling(csvData, config.family, null, 'Família');
+          if (familyMap && Object.keys(familyMap).length) {
+            csvData = applyNameMapping(csvData, config.family, familyMap);
+          }
+        }
+      }
+
+
+                    processData(config);
+                    showResults();
+                    showSuccess('Análise concluída com sucesso!');
+                } catch (error) {
+                    showError('Erro ao processar os dados: ' + error.message);
+                }
+            }
+
+            function processData(config) {
+                // Deep copy data
+                let data = csvData.map(row => ({...row}));
+
+                // Remove empty rows
+                data = data.filter(row => {
+                    return Object.values(row).some(value => value && value.trim() !== '');
+                });
+
+                // Flag dead individuals
+                const deadFilter = data.map(row => 
+                    row[config.taxon] && row[config.taxon].toLowerCase() === config.dead.toLowerCase()
+                );
+
+                // Count dead individuals
+                const deadCount = deadFilter.filter(d => d).length;
+
+                // Remove dead if requested
+                if (config.removeDead && deadCount > 0) {
+                    data = data.filter((row, index) => !deadFilter[index]);
+                    console.log(`${deadCount} árvores mortas removidas do conjunto de dados`);
+                }
+
+                // Calculate basal area for each individual
+                data.forEach(row => {
+                    const stems = (row[config.measure] ?? '')
+                      .split('+')
+                      .map(s => parseFloatNorm(s));
+
+                    let totalBA = 0;
+                    stems.forEach(stem => {
+                        if (stem > 0) {
+                            if (config.measureType === 'cbh') {
+                                totalBA += Math.pow(stem/100, 2) / (4 * Math.PI);
+                            } else {
+                                totalBA += (Math.PI * Math.pow(stem/100, 2)) / 4;
+                            }
+                        }
+                    });
+                    row.ABi = totalBA;
+                });
+
+                processedData = data;
+
+                // Call appropriate method
+                if (config.method === 'quadrat') {
+                    calculateQuadratMethod(data, config, deadFilter);
+                } else {
+                    calculatePointMethod(data, config, deadFilter);
+                }
+            }
+
+            function calculateQuadratMethod(data, config, deadFilter) {
+                const area = (new Set(data.map(row => row[config.su])).size * config.suSize) / 10000;
+
+                // Get original data including dead for diversity calculations
+                const originalData = csvData.map(row => ({...row}));
+
+                // Count by species (current data - may exclude dead)
+                const speciesCount = {};
+                data.forEach(row => {
+                    const species = row[config.taxon];
+                    speciesCount[species] = (speciesCount[species] || 0) + 1;
+                });
+
+                // Count all species including dead for diversity indices
+                const speciesCountWithDead = {};
+                originalData.forEach(row => {
+                    const species = row[config.taxon];
+                    if (species && species.trim() !== '') {
+                        speciesCountWithDead[species] = (speciesCountWithDead[species] || 0) + 1;
+                    }
+                });
+
+                // Count species excluding dead for diversity indices
+                const speciesCountExcludingDead = {};
+                originalData.forEach(row => {
+                    const species = row[config.taxon];
+                    if (species && species.trim() !== '' && species.toLowerCase() !== config.dead.toLowerCase()) {
+                        speciesCountExcludingDead[species] = (speciesCountExcludingDead[species] || 0) + 1;
+                    }
+                });
+
+                // Frequency
+                const suList = [...new Set(data.map(row => row[config.su]))];
+                const frequencyTable = {};
+                Object.keys(speciesCount).forEach(species => {
+                    let count = 0;
+                    suList.forEach(su => {
+                        if (data.some(row => row[config.taxon] === species && row[config.su] === su)) {
+                            count++;
+                        }
+                    });
+                    frequencyTable[species] = count;
+                });
+
+                // Dominance (basal area)
+                const basalArea = {};
+                data.forEach(row => {
+                    const species = row[config.taxon];
+                    basalArea[species] = (basalArea[species] || 0) + row.ABi;
+                });
+
+                // Volume (if height included)
+                const volume = {};
+                if (config.height) {
+                    data.forEach(row => {
+                        const species = row[config.taxon];
+                        const h = parseFloatNorm(row[config.height]);
+                        volume[species] = (volume[species] || 0) + (row.ABi * h * config.shapeFactor);
+                    });
+                }
+
+                // Calculate parameters (excluding dead from table)
+                const params = [];
+                const nTotal = Object.values(speciesCount).reduce((a, b) => a + b, 0);
+                const nSamples = suList.length;
+                const totalDominance = Object.values(basalArea).reduce((a, b) => a + b, 0);
+
+                Object.keys(speciesCount).forEach(species => {
+                    const n = speciesCount[species];
+                    const aDe = n / area;
+                    const rDe = (aDe / (nTotal / area)) * 100;
+                    const aFr = (frequencyTable[species] / nSamples) * 100;
+                    const rFr = (aFr / Object.values(frequencyTable).reduce((a, b) => a + b/nSamples * 100, 0)) * 100;
+                    const aDo = basalArea[species] / area;
+                    const rDo = (aDo / (totalDominance / area)) * 100;
+
+                    const row = {
+                        Taxon: species,
+                        N: n,
+                        ADe: aDe,
+                        RDe: rDe,
+                        AFr: aFr,
+                        RFr: rFr,
+                        ADo: aDo,
+                        RDo: rDo
+                    };
+
+                    if (config.height) {
+                        const aVol = volume[species] / area;
+                        const rVol = (aVol / Object.values(volume).reduce((a, b) => a + b/area, 0)) * 100;
+                        row.AVol = aVol;
+                        row.RVol = rVol;
+                    }
+
+                    row.IV = (parseFloat(rDe) + parseFloat(rFr) + parseFloat(rDo));
+                    row.CV = (parseFloat(rDe) + parseFloat(rDo));
+
+                    params.push(row);
+                });
+
+                // Sort by IV
+                params.sort((a, b) => parseFloat(b.IV) - parseFloat(a.IV));
+
+                // Calculate diversity indices with dead
+                const shannonWithDead = calculateShannonIndex(speciesCountWithDead);
+                const simpsonWithDead = calculateSimpsonIndex(speciesCountWithDead);
+                const pielouWithDead = shannonWithDead / Math.log(Object.keys(speciesCountWithDead).length);
+
+                // Calculate diversity indices excluding dead
+                const shannonExcludingDead = calculateShannonIndex(speciesCountExcludingDead);
+                const simpsonExcludingDead = calculateSimpsonIndex(speciesCountExcludingDead);
+                const pielouExcludingDead = shannonExcludingDead / Math.log(Object.keys(speciesCountExcludingDead).length);
+
+                // Count species and families excluding dead
+                const nSpecies = Object.keys(speciesCountExcludingDead).length;
+                let nFamilies = 0;
+
+                if (config.family) {
+                    const familiesSet = new Set();
+                    data.forEach(row => {
+                        if (row[config.taxon].toLowerCase() !== config.dead.toLowerCase() && row[config.family]) {
+                            familiesSet.add(row[config.family]);
+                        }
+                    });
+                    nFamilies = familiesSet.size;
+                }
+
+                // Global parameters
+                const global = [
+                    { Parameter: 'N° de indivíduos', Value: nTotal },
+                    { Parameter: 'N° de amostras', Value: nSamples },
+                    { Parameter: 'Área amostrada', Value: area },
+                    { Parameter: 'Densidade total', Value: (nTotal / area) },
+                    { Parameter: 'Dominância total', Value: (totalDominance / area) }
+                ];
+
+                if (config.family) {
+                    global.push({ Parameter: 'N° de famílias', Value: nFamilies });
+                }
+
+                global.push(
+                    { Parameter: 'N° de espécies', Value: nSpecies },
+                    { Parameter: 'Shannon-Wiener com mortas', Value: shannonWithDead },
+                    { Parameter: 'Shannon-Wiener excluindo mortas', Value: shannonExcludingDead },
+                    { Parameter: 'Pielou com mortas', Value: pielouWithDead },
+                    { Parameter: 'Pielou excluindo mortas', Value: pielouExcludingDead },
+                    { Parameter: 'Simpson com mortas', Value: simpsonWithDead },
+                    { Parameter: 'Simpson excluindo mortas', Value: simpsonExcludingDead }
+                );
+
+                // Family statistics if included
+                let family = null;
+                if (config.family) {
+                    family = calculateFamilyStats(data, config);
+                }
+
+                results = {
+                    global: global,
+                    param: params,
+                    family: family
+                };
+            }
+
+            function calculatePointMethod(data, config, deadFilter) {
+                // Get original data including dead for diversity calculations
+                const originalData = csvData.map(row => ({...row}));
+
+                // Calculate corrected distances and areas
+                data.forEach(row => {
+                    const distance = parseFloatNorm(row[config.distance]);
+                    const DC = distance + Math.sqrt(row.ABi / Math.PI);
+                    row.Ai = DC * DC * Math.PI / 4;
+                });
+
+                // Mean area per individual
+                const AM = data.reduce((sum, row) => sum + row.Ai, 0) / (data.length - 1);
+                const area = data.reduce((sum, row) => sum + row.Ai, 0) / 10000;
+                const DT = 10000 / AM; // Total density per hectare
+
+                // Count by species (current data - may exclude dead)
+                const speciesCount = {};
+                data.forEach(row => {
+                    const species = row[config.taxon];
+                    speciesCount[species] = (speciesCount[species] || 0) + 1;
+                });
+
+                // Count all species including dead for diversity indices
+                const speciesCountWithDead = {};
+                originalData.forEach(row => {
+                    const species = row[config.taxon];
+                    if (species && species.trim() !== '') {
+                        speciesCountWithDead[species] = (speciesCountWithDead[species] || 0) + 1;
+                    }
+                });
+
+                // Count species excluding dead for diversity indices
+                const speciesCountExcludingDead = {};
+                originalData.forEach(row => {
+                    const species = row[config.taxon];
+                    if (species && species.trim() !== '' && species.toLowerCase() !== config.dead.toLowerCase()) {
+                        speciesCountExcludingDead[species] = (speciesCountExcludingDead[species] || 0) + 1;
+                    }
+                });
+
+                // Frequency
+                const suList = [...new Set(data.map(row => row[config.su]))];
+                const frequencyTable = {};
+                Object.keys(speciesCount).forEach(species => {
+                    let count = 0;
+                    suList.forEach(su => {
+                        if (data.some(row => row[config.taxon] === species && row[config.su] === su)) {
+                            count++;
+                        }
+                    });
+                    frequencyTable[species] = count;
+                });
+
+                // Dominance (basal area)
+                const basalArea = {};
+                data.forEach(row => {
+                    const species = row[config.taxon];
+                    basalArea[species] = (basalArea[species] || 0) + row.ABi;
+                });
+
+                const ABM = data.reduce((sum, row) => sum + row.ABi, 0) / data.length;
+                const tADo = DT * ABM;
+
+                // Volume (if height included)
+                const volume = {};
+                if (config.height) {
+                    data.forEach(row => {
+                        const species = row[config.taxon];
+                        const h = parseFloatNorm(row[config.height]);
+                        volume[species] = (volume[species] || 0) + (row.ABi * h * config.shapeFactor);
+                    });
+                }
+
+                // Calculate parameters (excluding dead from table)
+                const params = [];
+                const nTotal = Object.values(speciesCount).reduce((a, b) => a + b, 0);
+                const nSamples = suList.length;
+                const totalABi = data.reduce((sum, row) => sum + row.ABi, 0);
+
+                Object.keys(speciesCount).forEach(species => {
+                    const n = speciesCount[species];
+                    const aDe = n * DT / nTotal;
+                    const rDe = (aDe / DT) * 100;
+                    const aFr = (frequencyTable[species] / nSamples) * 100;
+                    const rFr = (aFr / Object.values(frequencyTable).reduce((a, b) => a + b/nSamples * 100, 0)) * 100;
+                    const aDo = basalArea[species] * tADo / totalABi;
+                    const rDo = (aDo / tADo) * 100;
+
+                    const row = {
+                        Taxon: species,
+                        N: n,
+                        ADe: aDe,
+                        RDe: rDe,
+                        AFr: aFr,
+                        RFr: rFr,
+                        ADo: aDo,
+                        RDo: rDo
+                    };
+
+                    if (config.height) {
+                        const aVol = volume[species] / area;
+                        const rVol = (aVol / Object.values(volume).reduce((a, b) => a + b/area, 0)) * 100;
+                        row.AVol = aVol;
+                        row.RVol = rVol;
+                    }
+
+                    row.IV = (parseFloat(rDe) + parseFloat(rFr) + parseFloat(rDo));
+                    row.CV = (parseFloat(rDe) + parseFloat(rDo));
+
+                    params.push(row);
+                });
+
+                // Sort by IV
+                params.sort((a, b) => parseFloat(b.IV) - parseFloat(a.IV));
+
+                // Calculate diversity indices with dead
+                const shannonWithDead = calculateShannonIndex(speciesCountWithDead);
+                const simpsonWithDead = calculateSimpsonIndex(speciesCountWithDead);
+                const pielouWithDead = shannonWithDead / Math.log(Object.keys(speciesCountWithDead).length);
+
+                // Calculate diversity indices excluding dead
+                const shannonExcludingDead = calculateShannonIndex(speciesCountExcludingDead);
+                const simpsonExcludingDead = calculateSimpsonIndex(speciesCountExcludingDead);
+                const pielouExcludingDead = shannonExcludingDead / Math.log(Object.keys(speciesCountExcludingDead).length);
+
+                // Count species and families excluding dead
+                const nSpecies = Object.keys(speciesCountExcludingDead).length;
+                let nFamilies = 0;
+
+                if (config.family) {
+                    const familiesSet = new Set();
+                    data.forEach(row => {
+                        if (row[config.taxon].toLowerCase() !== config.dead.toLowerCase() && row[config.family]) {
+                            familiesSet.add(row[config.family]);
+                        }
+                    });
+                    nFamilies = familiesSet.size;
+                }
+
+                // Global parameters
+                const global = [
+                    { Parameter: 'N° de indivíduos', Value: nTotal },
+                    { Parameter: 'N° de amostras', Value: nSamples },
+                    { Parameter: 'Área amostrada', Value: area },
+                    { Parameter: 'Densidade total não-enviesada', Value: DT },
+                    { Parameter: 'Dominância total', Value: tADo }
+                ];
+
+                if (config.family) {
+                    global.push({ Parameter: 'N° de famílias', Value: nFamilies });
+                }
+
+                global.push(
+                    { Parameter: 'N° de espécies', Value: nSpecies },
+                    { Parameter: 'Shannon-Wiener com mortas', Value: shannonWithDead },
+                    { Parameter: 'Shannon-Wiener excluindo mortas', Value: shannonExcludingDead },
+                    { Parameter: 'Pielou com mortas', Value: pielouWithDead },
+                    { Parameter: 'Pielou excluindo mortas', Value: pielouExcludingDead },
+                    { Parameter: 'Simpson com mortas', Value: simpsonWithDead },
+                    { Parameter: 'Simpson excluindo mortas', Value: simpsonExcludingDead }
+                );
+
+                // Family statistics if included
+                let family = null;
+                if (config.family) {
+                    family = calculateFamilyStats(data, config);
+                }
+
+                results = {
+                    global: global,
+                    param: params,
+                    family: family
+                };
+            }
+
+            function calculateFamilyStats(data, config) {
+                const familyStats = {};
+
+                data.forEach(row => {
+                    const family = row[config.family];
+                    const species = row[config.taxon];
+
+                    if (!familyStats[family]) {
+                        familyStats[family] = {
+                            individuals: 0,
+                            species: new Set()
+                        };
+                    }
+
+                    familyStats[family].individuals++;
+                    familyStats[family].species.add(species);
+                });
+
+                return Object.entries(familyStats).map(([family, stats]) => ({
+                    Family: family,
+                    Individuals: stats.individuals,
+                    Species: stats.species.size
+                })).sort((a, b) => b.Individuals - a.Individuals);
+            }
+
+            function calculateShannonIndex(speciesCount) {
+                const total = Object.values(speciesCount).reduce((a, b) => a + b, 0);
+                let H = 0;
+                Object.values(speciesCount).forEach(count => {
+                    const p = count / total;
+                    if (p > 0) {
+                        H -= p * Math.log(p);
+                    }
+                });
+                return H;
+            }
+
+            function calculateSimpsonIndex(speciesCount) {
+                const total = Object.values(speciesCount).reduce((a, b) => a + b, 0);
+                let sum = 0;
+                Object.values(speciesCount).forEach(count => {
+                    sum += count * (count - 1);
+                });
+                return 1 - (sum / (total * (total - 1)));
+            }
+                    
+                function calculateStatistics() {
+        const areaTot = parseFloatNorm(document.getElementById('areaTot').value);
+        const prob = parseFloatNorm(document.getElementById('probConf').value);
+        const shapeFactor = parseFloatNorm(document.getElementById('shapeFactorStats').value);
+        const rmDead = document.getElementById('rmDead').checked;
+
+        if (!areaTot || areaTot <= 0) {
+            showError('Por favor, informe a área total do habitat.');
+            return;
+        }
+
+        if (!processedData || !currentConfig) {
+            showError('Dados não disponíveis. Execute a análise primeiro.');
+            return;
+        }
+
+        try {
+            // Preparar dados
+            let data = [...processedData];
+            const config = currentConfig;
+
+            // Filtrar mortas se necessário
+            let deadFilter = [];
+            if (rmDead && config.dead) {
+                deadFilter = data.map(row => 
+                    row[config.taxon] && row[config.taxon].toLowerCase() === config.dead.toLowerCase()
+                );
+                const deadCount = deadFilter.filter(d => d).length;
+                data = data.filter((row, index) => !deadFilter[index]);
+                if (deadCount > 0) {
+                    console.log(`${deadCount} árvores mortas removidas para estatísticas`);
+                }
+            }
+
+            // Calcular volume individual
+            if (config.height) {
+                data.forEach(row => {
+                    const h = parseFloatNorm(row[config.height]);
+                    row.Vi = row.ABi * h * shapeFactor;
+                });
+            }
+
+            // Estatísticas por unidade amostral
+            const suList = [...new Set(data.map(row => row[config.su]))];
+            const nSu = suList.length;
+            let suSize, deSu;
+
+            if (config.method === 'quadrat') {
+                suSize = config.suSize / 10000; // em hectares
+
+                // Densidade por unidade amostral
+                deSu = suList.map(su => {
+                    const count = data.filter(row => row[config.su] === su).length;
+                    return count / suSize;
+                });
+            } else {
+                // Método ponto-quadrante
+                const pointAreas = data.map(row => row.Ai);
+                suSize = (pointAreas.reduce((a, b) => a + b, 0) / pointAreas.length) / 10000;
+                deSu = pointAreas.map(area => 10000 / area);
+            }
+
+            // Volume e área basal por unidade amostral
+            const volSu = suList.map(su => {
+                const suData = data.filter(row => row[config.su] === su);
+                const vol = config.height ? 
+                    suData.reduce((sum, row) => sum + (row.Vi || 0), 0) / suSize : 0;
+                return vol;
+            });
+
+            const abSu = suList.map(su => {
+                const suData = data.filter(row => row[config.su] === su);
+                const ab = suData.reduce((sum, row) => sum + row.ABi, 0) / suSize;
+                return ab;
+            });
+
+            // Calcular estatísticas
+            const tValue = jStat.studentt.inv((1 + prob) / 2, nSu - 1);
+            const nSuArea = areaTot / suSize;
+            const percInvent = (results.global[2].Value / areaTot) * 100;
+
+            // Médias
+            const deMean = mean(deSu);
+            const volMean = config.height ? mean(volSu) : 0;
+            const abMean = mean(abSu);
+
+            // Desvios padrão
+            const deSd = stdDev(deSu);
+            const volSd = config.height ? stdDev(volSu) : 0;
+            const abSd = stdDev(abSu);
+
+            // Erros padrão
+            const deSe = deSd / Math.sqrt(nSu);
+            const volSe = volSd / Math.sqrt(nSu);
+            const abSe = abSd / Math.sqrt(nSu);
+
+            // CV
+            const deCV = (deSd / deMean) * 100;
+            const volCV = config.height && volMean > 0 ? (volSd / volMean) * 100 : 0;
+            const abCV = (abSd / abMean) * 100;
+
+            // Erros amostrais
+            const absDeError = deSe * tValue;
+            const absVolError = volSe * tValue;
+            const absAbError = abSe * tValue;
+
+            const relDeError = (absDeError / deMean) * 100;
+            const relVolError = config.height && volMean > 0 ? (absVolError / volMean) * 100 : 0;
+            const relAbError = (absAbError / abMean) * 100;
+
+            // Limites por hectare
+            const deLowerLim = deMean - absDeError;
+            const deUpperLim = deMean + absDeError;
+            const volLowerLim = volMean - absVolError;
+            const volUpperLim = volMean + absVolError;
+            const abLowerLim = abMean - absAbError;
+            const abUpperLim = abMean + absAbError;
+
+            // População
+            const popDe = deMean * areaTot;
+            const popVol = volMean * areaTot;
+            const popAb = abMean * areaTot;
+
+            const popDeError = popDe * relDeError / 100;
+            const popVolError = popVol * relVolError / 100;
+            const popAbError = popAb * relAbError / 100;
+
+            // N amostras para erro de 10% e 20%
+            const deError10 = (nSuArea * Math.pow(deSd, 2) * Math.pow(tValue, 2)) / 
+                             (nSuArea * Math.pow(deMean * 0.1, 2) + Math.pow(deSd, 2) * Math.pow(tValue, 2));
+            const deError20 = (nSuArea * Math.pow(deSd, 2) * Math.pow(tValue, 2)) / 
+                             (nSuArea * Math.pow(deMean * 0.2, 2) + Math.pow(deSd, 2) * Math.pow(tValue, 2));
+
+            const volError10 = config.height && volMean > 0 ? 
+                (nSuArea * Math.pow(volSd, 2) * Math.pow(tValue, 2)) / 
+                (nSuArea * Math.pow(volMean * 0.1, 2) + Math.pow(volSd, 2) * Math.pow(tValue, 2)) : 0;
+            const volError20 = config.height && volMean > 0 ?
+                (nSuArea * Math.pow(volSd, 2) * Math.pow(tValue, 2)) / 
+                (nSuArea * Math.pow(volMean * 0.2, 2) + Math.pow(volSd, 2) * Math.pow(tValue, 2)) : 0;
+
+            const abError10 = (nSuArea * Math.pow(abSd, 2) * Math.pow(tValue, 2)) / 
+                             (nSuArea * Math.pow(abMean * 0.1, 2) + Math.pow(abSd, 2) * Math.pow(tValue, 2));
+            const abError20 = (nSuArea * Math.pow(abSd, 2) * Math.pow(tValue, 2)) / 
+                             (nSuArea * Math.pow(abMean * 0.2, 2) + Math.pow(abSd, 2) * Math.pow(tValue, 2));
+
+            // Montar tabelas
+            statsResults.inventory = [
+                { Estatística: 'Área total (ha)', Valores: formatNumber(areaTot, 4) },
+                { Estatística: 'N° unidades amostrais', Valores: nSu },
+                { Estatística: 'N° UA na área total', Valores: formatNumber(nSuArea, 0) },
+                { Estatística: 'Área da UA (ha)', Valores: formatNumber(suSize, 4) },
+                { Estatística: 'Área inventariada', Valores: formatNumber(results.global[2].Value, 4) },
+                { Estatística: '% área inventariada', Valores: formatNumber(percInvent, 2) }
+            ];
+
+            statsResults.ha = [
+                { Estatística: 'Média', 'Densidade (N/ha)': formatNumber(deMean, 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(volMean, 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(abMean, 2) },
+                { Estatística: 'Variância', 'Densidade (N/ha)': formatNumber(Math.pow(deSd, 2), 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(Math.pow(volSd, 2), 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(Math.pow(abSd, 2), 2) },
+                { Estatística: 'Desvio padrão', 'Densidade (N/ha)': formatNumber(deSd, 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(volSd, 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(abSd, 2) },
+                { Estatística: 'Erro padrão', 'Densidade (N/ha)': formatNumber(deSe, 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(volSe, 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(abSe, 2) },
+                { Estatística: 'Coeficiente de Variação (%)', 'Densidade (N/ha)': formatNumber(deCV, 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(volCV, 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(abCV, 2) },
+                { Estatística: 'Erro amostral absoluto', 'Densidade (N/ha)': formatNumber(absDeError, 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(absVolError, 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(absAbError, 2) },
+                { Estatística: 'Erro amostral relativo (%)', 'Densidade (N/ha)': formatNumber(relDeError, 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(relVolError, 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(relAbError, 2) },
+                { Estatística: 'Limite inferior (ha)', 'Densidade (N/ha)': formatNumber(deLowerLim, 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(volLowerLim, 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(abLowerLim, 2) },
+                { Estatística: 'Limite superior (ha)', 'Densidade (N/ha)': formatNumber(deUpperLim, 2), 
+                  'Volume (m³/ha)': config.height ? formatNumber(volUpperLim, 2) : 'N/A', 
+                  'Área Basal (m²/ha)': formatNumber(abUpperLim, 2) }
+            ];
+
+            statsResults.population = [
+                { Estatística: 'Média', 
+                  'Densidade Total': formatNumber(popDe, 2), 
+                  'Volume Total (m³)': config.height ? formatNumber(popVol, 2) : 'N/A', 
+                  'Área Basal Total (m²)': formatNumber(popAb, 2) },
+                { Estatística: 'Limite inferior', 
+                  'Densidade Total': formatNumber(popDe - popDeError, 2), 
+                  'Volume Total (m³)': config.height ? formatNumber(popVol - popVolError, 2) : 'N/A', 
+                  'Área Basal Total (m²)': formatNumber(popAb - popAbError, 2) },
+                { Estatística: 'Limite superior', 
+                  'Densidade Total': formatNumber(popDe + popDeError, 2), 
+                  'Volume Total (m³)': config.height ? formatNumber(popVol + popVolError, 2) : 'N/A', 
+                  'Área Basal Total (m²)': formatNumber(popAb + popAbError, 2) },
+                { Estatística: 'N° UA (erro 10%)', 
+                  'Densidade Total': formatNumber(Math.ceil(deError10), 0), 
+                  'Volume Total (m³)': config.height ? formatNumber(Math.ceil(volError10), 0) : 'N/A', 
+                  'Área Basal Total (m²)': formatNumber(Math.ceil(abError10), 0) },
+                { Estatística: 'N° UA (erro 20%)', 
+                  'Densidade Total': formatNumber(Math.ceil(deError20), 0), 
+                  'Volume Total (m³)': config.height ? formatNumber(Math.ceil(volError20), 0) : 'N/A', 
+                  'Área Basal Total (m²)': formatNumber(Math.ceil(abError20), 0) }
+            ];
+
+                // Mostrar resultados
+                showStatsResults();
+                showSuccess('Estatísticas calculadas com sucesso!');
+
+            } catch (error) {
+                showError('Erro ao calcular estatísticas: ' + error.message);
+                console.error(error);
+            }
+        }
+
+    function showStatsResults() {
+        // Mostrar tabelas
+        const inventoryColumns = Object.keys(statsResults.inventory[0]);
+        const haColumns = Object.keys(statsResults.ha[0]);
+        const populationColumns = Object.keys(statsResults.population[0]);
+
+        document.getElementById('inventoryTable').innerHTML = createTable(statsResults.inventory, inventoryColumns);
+        document.getElementById('haTable').innerHTML = createTable(statsResults.ha, haColumns);
+        document.getElementById('populationTable').innerHTML = createTable(statsResults.population, populationColumns);
+
+        document.getElementById('statsResults').style.display = 'block';
+    }
+
+    // Funções auxiliares para estatísticas
+    function mean(arr) {
+        return arr.reduce((a, b) => a + b, 0) / arr.length;
+    }
+
+    function stdDev(arr) {
+        const m = mean(arr);
+        return Math.sqrt(arr.reduce((sq, n) => sq + Math.pow(n - m, 2), 0) / (arr.length - 1));
+    }
+    
+            function showResults() {
+                    // Show global parameters
+                    const globalTable = createTable(results.global, ['Parameter', 'Value']);
+                    document.getElementById('globalTable').innerHTML = globalTable;
+
+                    // Show family parameters if available
+                    if (results.family) {
+                        const familyTable = createTable(results.family, ['Family', 'Individuals', 'Species']);
+                        document.getElementById('familyTable').innerHTML = familyTable;
+                        document.getElementById('familyResults').style.display = 'block';
+                    }
+
+                    // Show phytosociological parameters
+                    const paramColumns = Object.keys(results.param[0]);
+                    const paramTable = createTable(results.param, paramColumns);
+                    document.getElementById('paramTable').innerHTML = paramTable;
+
+                    document.getElementById('resultsSection').style.display = 'block';
+                    // Show Stats section
+                    document.getElementById('statsSection').style.display = 'block';
+                }
+
+
+                function formatNumber(value, decimals) {
+                    if (typeof value !== 'number' || !isFinite(value)) return value;
+                    return value.toFixed(decimals);
+                }
+                function formatCell(columns, col, value) {
+                    // Global table
+                    if (columns.length===2 && columns[0]==='Parameter' && columns[1]==='Value') {
+                        if (typeof value === 'number') return formatNumber(value, 4);
+                        return value;
+                    }
+                    // Family table
+                    if (columns.includes('Family') && (columns.includes('Individuals') || columns.includes('Species'))) {
+                        if (typeof value === 'number') return Number.isInteger(value) ? String(value) : formatNumber(value, 0);
+                        return value;
+                    }
+                    // Param table
+                    if (col === 'N') {
+                        if (typeof value === 'number') return String(Math.round(value));
+                        return value;
+                    }
+                    if (typeof value === 'number') {
+                        return formatNumber(value, 2);
+                    }
+                    return value;
+                }
+                    
+    function createTable(data, columns) {
+                let html = '<table class="data-table">';
+                html += '<thead><tr>';
+                columns.forEach(col => {
+                    html += `<th>${col}</th>`;
+                });
+                html += '</tr></thead><tbody>';
+
+                data.forEach(row => {
+                    html += '<tr>';
+                    columns.forEach(col => {
+                        html += `<td>${row[col] !== undefined ? formatCell(columns, col, row[col]) : ""}</td>`;
+                    });
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                return html;
+            }
+
+                function copyToExcel(type) {
+        let data;
+
+        // Determinar qual tabela usar
+        if (type === 'inventory' || type === 'ha' || type === 'population') {
+            data = statsResults[type];
+        } else {
+            data = results[type];
+        }
+
+        if (!data) return;
+
+        let text = '';
+        const columns = Object.keys(data[0]);
+
+        // Headers
+        text += columns.join('\t') + '\n';
+
+        // Data
+        data.forEach(row => {
+            text += columns.map(col => (row[col] !== undefined ? formatCell(columns, col, row[col]) : "" )).join('\t') + '\n';
+        });
+
+        // Copy to clipboard
+        navigator.clipboard.writeText(text).then(() => {
+            showSuccess('Dados copiados para a área de transferência!');
+        }).catch(() => {
+            showError('Erro ao copiar dados.');
+        });
+    }
+
+            // === Copiar tabelas para Word (Clipboard HTML) ===
+            async function copyHTMLToClipboard(html) {
+              // Usa Clipboard API com text/html; fallback para execCommand
+              if (navigator.clipboard && window.ClipboardItem) {
+                const item = new ClipboardItem({
+                  "text/html": new Blob([html], { type: "text/html" }),
+                  "text/plain": new Blob([html.replace(/<[^>]+>/g, '')], { type: "text/plain" })
+                });
+                await navigator.clipboard.write([item]);
+              } else {
+                const div = document.createElement('div');
+                div.contentEditable = 'true';
+                div.style.position = 'fixed';
+                div.style.left = '-9999px';
+                div.innerHTML = html;
+                document.body.appendChild(div);
+                const range = document.createRange();
+                range.selectNodeContents(div);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                document.execCommand('copy');
+                sel.removeAllRanges();
+                document.body.removeChild(div);
+              }
+            }
+
+            // Clona a <table> e aplica estilos inline para o Word
+            function inlineTableHTML(tableEl) {
+              const t = tableEl.cloneNode(true);
+              t.removeAttribute('class');
+              t.style.borderCollapse = 'collapse';
+              t.style.width = '100%';
+              t.querySelectorAll('th, td').forEach(cell => {
+                cell.style.border = '1px solid #9e9e9e';
+                cell.style.padding = '6px 8px';
+              });
+              t.querySelectorAll('th').forEach(th => {
+                th.style.background = '#e8f5e9'; // tom suave já usado no app
+                th.style.fontWeight = '600';
+              });
+              return t.outerHTML;
+            }
+
+            // Copia a tabela renderizada (global/family/param) como HTML para o Word
+    async function copyToWord(type) {
+        let containerId;
+
+        // Determinar qual container usar
+        if (type === 'global') {
+            containerId = 'globalTable';
+        } else if (type === 'family') {
+            containerId = 'familyTable';
+        } else if (type === 'param') {
+            containerId = 'paramTable';
+        } else if (type === 'inventory') {
+            containerId = 'inventoryTable';
+        } else if (type === 'ha') {
+            containerId = 'haTable';
+        } else if (type === 'population') {
+            containerId = 'populationTable';
+        }
+
+        const container = document.getElementById(containerId);
+        const table = container && container.querySelector('table');
+
+        if (!table) { 
+            showError('Tabela não encontrada.'); 
+            return; 
+        }
+
+        const html = inlineTableHTML(table);
+
+        try {
+            await copyHTMLToClipboard(html);
+            showSuccess('Tabela copiada! Cole no Word (Ctrl+V).');
+        } catch (e) {
+            showError('Não foi possível copiar para o Word.');
+        }
+    }
+
+    function downloadCSV(type) {
+        let data;
+
+        // Determinar qual tabela usar
+        if (type === 'inventory' || type === 'ha' || type === 'population') {
+            data = statsResults[type];
+        } else {
+            data = results[type];
+        }
+
+        if (!data) return;
+
+        const columns = Object.keys(data[0]);
+        let csv = '';
+
+        // Headers
+        csv += columns.join(csvSeparator) + '\n';
+
+        // Data
+        data.forEach(row => {
+            csv += columns.map(col => {
+                let value = row[col] !== undefined ? formatCell(columns, col, row[col]).toString() : '';
+                // Convert decimal point to user preference
+                if (csvDecimal === ',' && !isNaN(value)) {
+                    value = value.replace('.', ',');
+                }
+                return value;
+            }).join(csvSeparator) + '\n';
+        });
+
+    // Adicionar BOM UTF-8 para garantir codificação correta
+    const BOM = '\uFEFF';
+    const csvWithBOM = BOM + csv;
+    
+    // Download com codificação UTF-8
+    const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${type}_parameters.csv`;
+    link.click();
+}
+
+            function downloadProcessedData() {
+                if (!processedData) return;
+
+                const headers = Object.keys(processedData[0]);
+                let csv = '';
+
+                // Headers
+                csv += headers.join(csvSeparator) + '\n';
+
+                // Data
+                processedData.forEach(row => {
+                    csv += headers.map(header => {
+                        let value = row[header] !== undefined ? row[header].toString() : '';
+                        // Convert decimal point for ABi
+                        if (header === 'ABi' && csvDecimal === ',') {
+                            value = value.replace('.', ',');
+                        }
+                        return value;
+                    }).join(csvSeparator) + '\n';
+                });
+
+                // Download
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'processed_data_with_basal_area.csv';
+                link.click();
+            }
+
+            function resetAnalysis() {
+                // Reset all variables
+                csvData = null;
+                selectedMethod = null;
+                processedData = null;
+                results = {};
+
+                // Reset UI
+                document.getElementById('fileInput').value = '';
+                document.getElementById('methodSelector').style.display = 'none';
+                document.getElementById('configPanel').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'none';
+                document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+
+                // Reset form values
+                document.getElementById('deadIndicator').value = '';
+                document.getElementById('suSize').value = '100';
+                document.getElementById('shapeFactor').value = '1';
+                document.getElementById('removeDead').checked = false;
+                document.getElementById('noHeight').checked = false;
+                document.getElementById('noFamily').checked = false;
+                document.getElementById('checkSpelling').checked = true;
+
+                // Ocultar grupos que dependem do método
+                document.getElementById('distanceGroup').style.display = 'none';
+                document.getElementById('suSizeGroup').style.display   = 'none';
+
+                // Clear messages
+                hideMessages();
+                
+                // Reset das estatíticas
+                statsResults = {};
+                currentConfig = null;
+                document.getElementById('statsSection').style.display = 'none';
+                document.getElementById('statsResults').style.display = 'none';
+                document.getElementById('areaTot').value = '';
+                
+                showSuccess('Pronto para uma nova análise!');
+            }
+
+            function showError(message) {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            }
+
+            function showSuccess(message) {
+                const successDiv = document.getElementById('successMessage');
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                }, 5000);
+            }
+
+            function hideMessages() {
+                document.getElementById('errorMessage').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'none';
+            }
+
+
+    // ===== Helpers de decimal =====
+    function normalizeDecimalString(s) {
+      return (s ?? '').toString().trim().replace(/,/g, '.'); // todas as vírgulas -> ponto
+    }
+    function parseFloatNorm(s) {
+      const x = parseFloat(normalizeDecimalString(s));
+      return Number.isFinite(x) ? x : 0;
+    }
+
+
+    // ===== Helpers de normalização e similaridade =====
+    function normalizeText(s) {
+      return (s ?? '')
+        .toString()
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')   // remove acentos
+        .replace(/\s+/g, ' ');             // colapsa espaços
+    }
+
+    // Levenshtein distance
+    function levenshtein(a, b) {
+      a = a || ''; b = b || '';
+      const m = a.length, n = b.length;
+      if (!m) return n;
+      if (!n) return m;
+      const dp = Array.from({length: m + 1}, (_, i) => new Array(n + 1).fill(0));
+      for (let i=0;i<=m;i++) dp[i][0] = i;
+      for (let j=0;j<=n;j++) dp[0][j] = j;
+      for (let i=1;i<=m;i++) {
+        for (let j=1;j<=n;j++) {
+          const cost = a[i-1] === b[j-1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i-1][j] + 1,      // del
+            dp[i][j-1] + 1,      // ins
+            dp[i-1][j-1] + cost  // sub
+          );
+        }
+      }
+      return dp[m][n];
+    }
+
+    // Similaridade como 1 - dist/len_max (0..1)
+    function similarityRatio(a, b) {
+      a = normalizeText(a); b = normalizeText(b);
+      const L = Math.max(a.length, b.length) || 1;
+      return 1 - (levenshtein(a, b) / L);
+    }
+
+    // ===== Clusterização por similaridade (união de componentes) =====
+    function clusterSimilar(names, opts = {}) {
+      const {
+        threshold = 0.88,
+        exclude = new Set()
+      } = opts;
+
+      const uniq = Array.from(new Set(names.filter(Boolean)));
+      const filtered = uniq.filter(n => {
+        const nn = normalizeText(n);
+        return nn.length > 1 && !exclude.has(normalizeText(n));
+      });
+
+      const parent = new Map();
+      const find = (x) => {
+        if (parent.get(x) !== x) parent.set(x, find(parent.get(x)));
+        return parent.get(x);
+      };
+      const union = (x, y) => {
+        x = find(x); y = find(y);
+        if (x !== y) parent.set(x, y);
+      };
+
+      filtered.forEach(n => parent.set(n, n));
+
+      for (let i=0; i<filtered.length; i++) {
+        for (let j=i+1; j<filtered.length; j++) {
+          const a = filtered[i], b = filtered[j];
+          const sim = similarityRatio(a, b);
+          if (sim >= threshold) union(a, b);
+        }
+      }
+
+      const groups = new Map(); // root -> [names]
+      filtered.forEach(n => {
+        const r = find(n);
+        if (!groups.has(r)) groups.set(r, []);
+        groups.get(r).push(n);
+      });
+
+      return Array.from(groups.values()).filter(g => g.length >= 2);
+    }
+
+    // ===== Diálogo para escolher o nome canônico por grupo =====
+    function showSpellingDialog(groups, label) {
+      return new Promise((resolve) => {
+        const dlg = document.getElementById('spellingDialog');
+        const host = document.getElementById('spellingGroups');
+        host.innerHTML = '';
+
+        groups.forEach((arr, idx) => {
+          const block = document.createElement('div');
+          block.style.cssText = 'background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:10px;margin:8px 0';
+          const title = document.createElement('div');
+          title.innerHTML = `<strong>Grupo ${idx+1} (${label})</strong>`;
+          block.appendChild(title);
+
+          const sel = document.createElement('select');
+          sel.style.cssText = 'margin-top:8px; width: 100%';
+          arr.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            sel.appendChild(opt);
+          });
+          block.appendChild(sel);
+
+          const small = document.createElement('div');
+          small.style.cssText = 'margin-top:6px;color:#777;font-size:12px';
+          small.textContent = `Outros no grupo: ${arr.join(' · ')}`;
+          block.appendChild(small);
+
+          const cbxWrap = document.createElement('div');
+          cbxWrap.style.cssText = 'margin-top:6px; display:flex; flex-wrap:wrap; gap:8px';
+          arr.forEach(nm => {
+            const lab = document.createElement('label');
+            lab.style.cssText = 'border:1px solid #ddd; padding:4px 8px; border-radius:8px; background:#f7f7f7';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = true;
+            cb.dataset.name = nm;
+            cb.style.marginRight = '6px';
+            lab.appendChild(cb);
+            lab.appendChild(document.createTextNode(nm));
+            cbxWrap.appendChild(lab);
+          });
+          block.appendChild(cbxWrap);
+
+          sel.addEventListener('change', () => {
+            cbxWrap.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+              cb.checked = (cb.dataset.name !== sel.value);
+            });
+          });
+
+          host.appendChild(block);
+        });
+
+        dlg.showModal();
+
+        dlg.addEventListener('close', () => {
+          if (dlg.returnValue === 'apply') {
+            const mapping = {};
+            const blocks = host.children;
+            Array.from(blocks).forEach(block => {
+              const sel = block.querySelector('select');
+              const chosen = sel.value;
+              block.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if (cb.checked && cb.dataset.name !== chosen) {
+                  mapping[cb.dataset.name] = chosen;
+                }
+              });
+            });
+            resolve(mapping);
+          } else {
+            resolve(null);
+          }
+        }, { once: true });
+
+        document.getElementById('applySpellingBtn').onclick = () => { dlg.close('apply'); };
+        document.getElementById('skipSpellingBtn').onclick  = () => { dlg.close('skip');  };
+      });
+    }
+
+    // ===== Orquestra a checagem (constrói grupos e chama o diálogo) =====
+    async function checkAndResolveSpelling(data, column, deadLabel, label) {
+      const values = data.map(r => r[column]).filter(v => v && v.trim() !== '');
+      const exclude = new Set();
+      if (deadLabel) exclude.add(normalizeText(deadLabel));
+
+      const threshold = (label === 'Família') ? 0.92 : 0.88;
+      const groups = clusterSimilar(values, { threshold, exclude });
+      if (!groups.length) return null;
+
+      return await showSpellingDialog(groups, label);
+    }
+
+    // ===== Aplica o dicionário de substituições nos dados =====
+    function applyNameMapping(data, column, mapping) {
+      const keys = Object.keys(mapping || {});
+      if (!keys.length) return data;
+
+      return data.map(row => {
+        const val = row[column];
+        if (!val) return row;
+        if (mapping[val] !== undefined) {
+          return { ...row, [column]: mapping[val] };
+        } else {
+          const norm = normalizeText(val);
+          for (const k of keys) {
+            if (normalizeText(k) === norm) {
+              return { ...row, [column]: mapping[k] };
+            }
+          }
+        }
+        return row;
+      });
+    }
+
+    </script>
+
+    <dialog id="spellingDialog" style="max-width: 900px; border: none; border-radius: 16px; padding: 0;">
+      <form method="dialog" style="padding: 20px 24px;">
+        <h3 style="color:#2e7d32; margin-bottom:10px">Revisão de grafia: grupos de nomes semelhantes</h3>
+        <p style="margin-bottom:12px; color:#555">Selecione o <strong>nome correto</strong> para cada grupo. Os demais serão corrigidos para o nome escolhido.</p>
+        <div id="spellingGroups" style="max-height: 50vh; overflow:auto; border:1px solid #e0e0e0; border-radius:10px; padding:10px; background:#fafafa"></div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px">
+          <button id="skipSpellingBtn" class="btn btn-secondary" value="skip">Ignorar correções</button>
+          <button id="applySpellingBtn" class="btn" value="apply">Aplicar correções</button>
+        </div>
+      </form>
+    </dialog>
+
+    </body>
+    </html>
